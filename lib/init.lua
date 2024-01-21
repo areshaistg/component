@@ -26,7 +26,7 @@ local AttributeMetatable = {
 		if not valid and msg then
 			error("cannot set attribute " .. key .. ": " .. msg, 2)
 		elseif not valid then
-			error("cannot set attribute " .. key, 2)
+			error("cannot set attribute " .. key .. ": no message provided", 2)
 		end
 
 		return t.__i:SetAttribute(key, val)
@@ -41,6 +41,7 @@ Component.AttachedComponents = {}
 export type ComponentClass<T> = {
 	Tag: string,
 	Attributes: AttributeMap,
+	Hierarchy: Typechecker?,
 
 	Start: (ci: ComponentInstance & T) -> ()?,
 	Stop: (ci: ComponentInstance & T) -> ()?,
@@ -55,7 +56,7 @@ export type ComponentInstance = {
 function Component.Create<T>(opts: {
 	Tag: string,
 	Attributes: AttributeMap?,
-	Children: { [string]: Typechecker }?,
+	Hierarchy: Typechecker?,
 	IsA: string?,
 }): ComponentClass<T>
 	if type(opts.Tag) ~= "string" then
@@ -66,6 +67,7 @@ function Component.Create<T>(opts: {
 
 	self.Tag = opts.Tag
 	self.Attributes = opts.Attributes or {}
+	self.Hierarchy = opts.Hierarchy
 
 	return self
 end
@@ -86,6 +88,18 @@ end
 
 function Component.Register<T>(c: ComponentClass<T>)
 	local function onInstanceAdded(i: Instance)
+		if c.Hierarchy then
+			print("hierarchy found")
+			local valid, msg = c.Hierarchy(i)
+			if not valid then
+				if msg then
+					warn(i:GetFullName() .. ": incorrect hierarchy: " .. msg)
+				else
+					warn(i:GetFullName() .. ": incorrect hierarchy: no message provided")
+				end
+				return
+			end
+		end
 		local ci = Initialize(i, c)
 		Component.AttachedComponents[i] = ci
 	end
