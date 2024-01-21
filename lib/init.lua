@@ -45,6 +45,8 @@ export type ComponentClass<T> = {
 
 	Start: (ci: ComponentInstance & T) -> ()?,
 	Stop: (ci: ComponentInstance & T) -> ()?,
+
+	[string]: (ci: ComponentInstance & T, ...any) -> ...any,
 }
 
 export type ComponentInstance = {
