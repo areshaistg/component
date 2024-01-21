@@ -36,12 +36,13 @@ local AttributeMetatable = {
 -- [[ Component ]] ----------------------------------------
 local Component = {}
 
-Component.AttachedComponents = {}
-
 export type ComponentClass<T> = {
 	Tag: string,
+	AttachedInstances: { [Instance]: ComponentInstance & T },
 	Attributes: AttributeMap,
 	Hierarchy: Typechecker?,
+
+	From: (i: Instance) -> (ComponentInstance & T)?,
 
 	Start: (ci: ComponentInstance & T) -> ()?,
 	Stop: (ci: ComponentInstance & T) -> ()?,
@@ -68,8 +69,12 @@ function Component.Create<T>(opts: {
 	local self = {}
 
 	self.Tag = opts.Tag
+	self.AttachedInstances = {}
 	self.Attributes = opts.Attributes or {}
 	self.Hierarchy = opts.Hierarchy
+	self.From = function(i: Instance)
+		return self.AttachedInstances[i]
+	end
 
 	return self
 end
@@ -103,16 +108,16 @@ function Component.Register<T>(c: ComponentClass<T>)
 			end
 		end
 		local ci = Initialize(i, c)
-		Component.AttachedComponents[i] = ci
+		c.AttachedInstances[i] = ci :: ComponentInstance & T
 	end
 
 	local function onInstanceRemoved(i: Instance)
-		local ci = Component.AttachedComponents[i]
+		local ci = c.AttachedInstances[i]
 		if ci then
 			if c.Stop then
 				c.Stop(ci :: ComponentInstance & T)
 			end
-			Component.AttachedComponents[i] = nil
+			c.AttachedInstances[i] = nil
 		end
 	end
 
