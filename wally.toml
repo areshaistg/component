@@ -1,7 +1,9 @@
 [package]
-name = "gaby3/component"
+name = "areshaistg/component"
 version = "0.1.0"
+license = "MIT"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
+include = ["lib", "default.project.json"]
 
 [dependencies]
