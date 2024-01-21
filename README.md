@@ -2,7 +2,7 @@
 
 Roblox Component Module that integrates CollectionService Tags and Attributes together. WIth typesafe (albeit runtime only) attributes, and quick autocompletion.
 
-Highly inspired by sleitnick's Component module from [RbxUtil](https://github.com/Sleitnick/RbxUtil).
+Highly inspired by sleitnick's [Component](https://sleitnick.github.io/RbxUtil/api/Component) module from [RbxUtil](https://github.com/Sleitnick/RbxUtil).
 
 ## Installing
 
